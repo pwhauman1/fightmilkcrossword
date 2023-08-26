@@ -1,5 +1,5 @@
 <script lang="ts">
-    let clue: string = 'Some Clue';
+    let clue: string = 'Fight Milk Cross Word Coming Soon';
 </script>
 
 <h1>

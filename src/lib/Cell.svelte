@@ -1,12 +1,12 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { type ICoordinate } from "../Interfaces";
-    export let dHead: ICoordinate;
-    export let aHead: ICoordinate;
+    export let dHead: ICoordinate | undefined = undefined;
+    export let aHead: ICoordinate | undefined = undefined;
     export let answer: string;
     export let coordinate: ICoordinate;
-    export let aAnswer: string;
-    export let dAnswer: string;
+    export let aAnswer: string | undefined = undefined;
+    export let dAnswer: string | undefined = undefined;
     onMount(() => {
         console.log(`mounted ${coordinate}`, {
             dHead,
@@ -19,9 +19,10 @@
 
     let value = '';
     let isCorrect = false;
-    $: isCorrect = value === answer;
-    
+    $: isCorrect = value === answer.toUpperCase();
+
     const onkeyup = () => {
+        value = value.toUpperCase();
         if (value.length > 1) {
             value = value.slice(-1);
         }

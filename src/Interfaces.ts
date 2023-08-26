@@ -10,10 +10,10 @@ export interface IBoarder extends ITileCommon {
 };
 export interface ICell extends ITileCommon {
     type: 'cell',
-    aAnswer: string,
-    dAnswer: string,
-    aHead: ICoordinate,
-    dHead: ICoordinate,
+    aAnswer?: string,
+    dAnswer?: string,
+    aHead?: ICoordinate,
+    dHead?: ICoordinate,
     answer: string,
 }
 export type ITile = ICell | IBoarder;
