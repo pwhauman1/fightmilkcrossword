@@ -2,56 +2,68 @@ import type { IBoarder, ICell, ICoordinate, ITile } from "../Interfaces";
 
 export function getRows(): ITile[][] {
     const word = 'COMINGSOON';
-    const mainRow: ITile[] = [{
-        type: 'boarder',
-        coordinate: [0,1],
-    }];
     const topRow: IBoarder[] = [{
         type: 'boarder',
-        coordinate: [0,0],
+        coordinate: [0, 0],
+    }];
+    const mainRow: ITile[] = [{
+        type: 'boarder',
+        coordinate: [0, 1],
+    }];
+    const mainRow2: ITile[] = [{
+        type: 'boarder',
+        coordinate: [0, 2],
     }];
     const bottomRow: IBoarder[] = [{
         type: 'boarder',
-        coordinate: [0,2],
+        coordinate: [0, 3],
     }];
     word.split('').forEach((c, idx) => {
-        const coordinate = [
-            idx + 1,
-            1
-        ] satisfies ICoordinate;
-        mainRow.push({
-            type: 'cell',
-            aAnswer: word,
-            aHead: [1,1],
-            answer: c,
-            coordinate,
-        });
         topRow.push({
             type: "boarder",
             coordinate: [idx + 1, 0],
         });
+        mainRow.push({
+            type: 'cell',
+            aHead: [1, 1],
+            dHead: [idx + 1, 1],
+            answer: c,
+            coordinate: [idx + 1, 1],
+        });
+        mainRow2.push({
+            type: 'cell',
+            aHead: [1, 2],
+            dHead: [idx + 1, 1],
+            answer: c,
+            coordinate: [idx + 1, 2],
+        });
         bottomRow.push({
             type: "boarder",
-            coordinate: [idx + 1, 2],
+            coordinate: [idx + 1, 3],
         });
     });
     const len = word.length;
-    mainRow.push({
-        type: 'boarder',
-        coordinate: [len, 1], 
-    });
     topRow.push({
         type: "boarder",
         coordinate: [len, 0],
     });
-    bottomRow.push({
-        type: "boarder",
+    mainRow.push({
+        type: 'boarder',
+        coordinate: [len, 1],
+    });
+    mainRow2.push({
+        type: 'boarder',
         coordinate: [len, 2],
     });
-    
+    bottomRow.push({
+        type: "boarder",
+        coordinate: [len, 3],
+    });
+
     return [
         topRow,
         mainRow,
+        mainRow2,
         bottomRow,
     ];
     // const row1: ICell[] = [

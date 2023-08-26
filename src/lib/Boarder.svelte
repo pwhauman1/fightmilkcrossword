@@ -1,10 +1,6 @@
 <script lang="ts">
-    import { onMount } from "svelte";
     import { type ICoordinate } from "../Interfaces";
     export let coordinate: ICoordinate;
-    onMount(() => {
-        console.log(`mounted boarder ${coordinate}`);
-    });
 
 </script>
 

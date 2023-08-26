@@ -1,39 +1,67 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import { type ICoordinate } from "../Interfaces";
+    import { currentHeadStore, selectedCellStore } from "../modules/Stores";
+    import { onCellClick, onCellInput } from "../modules/InteractionModule";
+    import { doCoordsEqual } from "../modules/Utils";
+    import type { Unsubscriber } from "svelte/store";
+    export const type = "cell";
     export let dHead: ICoordinate | undefined = undefined;
     export let aHead: ICoordinate | undefined = undefined;
     export let answer: string;
     export let coordinate: ICoordinate;
-    export let aAnswer: string | undefined = undefined;
-    export let dAnswer: string | undefined = undefined;
+
+    let me: HTMLInputElement;
+    let unsubs: Unsubscriber[] = [];
+    let value = "";
+    let shouldHighlight = false;
     onMount(() => {
-        console.log(`mounted ${coordinate}`, {
-            dHead,
-            aHead,
-            answer,
-            aAnswer,
-            dAnswer,
+        const nextFocusUnsub = selectedCellStore.subscribe((event) => {
+            if (!event) return;
+            if (!doCoordsEqual(event.coordinate, coordinate)) return;
+            me.focus();
+            if (event.clear) {
+                value = "";
+            }
         });
+        const currentHeadUnsub = currentHeadStore.subscribe((event) => {
+            if (!event) return;
+            const { head, orientation } = event;
+            if (!head) return;
+            if (orientation === 'across') shouldHighlight = doCoordsEqual(aHead, head);
+            if (orientation === 'down') shouldHighlight = doCoordsEqual(dHead, head)
+        });
+        unsubs.push(nextFocusUnsub);
+        unsubs.push(currentHeadUnsub);
     });
 
-    let value = '';
-    let isCorrect = false;
-    $: isCorrect = value === answer.toUpperCase();
+    onDestroy(() => {
+        unsubs.forEach((u) => u());
+    });
 
-    const onkeyup = () => {
+    const onkeyup = (e: KeyboardEvent) => {
         value = value.toUpperCase();
         if (value.length > 1) {
             value = value.slice(-1);
         }
+        onCellInput({ coordinate, key: e.key });
     };
-    
+    const onclick = () => {
+        onCellClick({
+            aHead,
+            dHead,
+            coordinate,
+        });
+    };
 </script>
 
-<input 
+<input
     bind:value
-    on:keyup={onkeyup} 
-    class:is-correct={isCorrect}/>
+    on:keyup={onkeyup}
+    on:click={onclick}
+    class:is-correct={shouldHighlight}
+    bind:this={me}
+/>
 
 <style>
     input {

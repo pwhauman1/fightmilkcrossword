@@ -10,8 +10,6 @@ export interface IBoarder extends ITileCommon {
 };
 export interface ICell extends ITileCommon {
     type: 'cell',
-    aAnswer?: string,
-    dAnswer?: string,
     aHead?: ICoordinate,
     dHead?: ICoordinate,
     answer: string,
@@ -25,3 +23,5 @@ export interface IWordForConfig {
     relatedAnswers?: IWordForConfig['answer'][],
     orientation: IOrientation
 }
+
+export type IKeyType = 'char' | 'delete' | 'ignore';
