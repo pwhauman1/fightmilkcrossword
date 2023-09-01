@@ -35,11 +35,13 @@
     } 
 
     const boardCsvSource = "/board.csv";
-    const answerKeyCsvSource = "/answerKey.csv";
     boardCsv = new Csv(boardCsvSource, boardValidator, false);
     const boardPromise = boardCsv.ingest();
+
+    const answerKeyCsvSource = "/answerKey.csv";
     answerKeyCsv = new Csv(answerKeyCsvSource, answerKeyValidator, true);
     const answerKeyPromise = answerKeyCsv.ingest();
+    
     const isBoardReadyPromise = Promise.all([boardPromise, answerKeyPromise]);
 </script>
 
@@ -49,7 +51,7 @@
             <p>Loading...</p>
         {:then _} 
             <Header answerKey={answerKeyCsv.getCsv()}/>
-            <Board />  
+            <Board board={boardCsv.getCsv()}/>  
         {/await}
     </div>
 </main>

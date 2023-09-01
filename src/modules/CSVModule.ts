@@ -28,7 +28,7 @@ export class Csv<T> {
         const data = await res.text();
         parse<T>(data, {
             header: this.areHeadersPresent,
-            complete: this.onParse
+            complete: this.onParse,
         });
     }
     private onParse = (res: ParseResult<T>): void => {

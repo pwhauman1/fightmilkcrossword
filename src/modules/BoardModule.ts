@@ -1,118 +1,71 @@
-import type { IBoarder, ICell, ICoordinate, ITile } from "../Interfaces";
+import type { IBoarder, ICell, ICellType, ICoordinate, ITile } from "../Interfaces";
 
-export function getRows(): ITile[][] {
-    const word = 'COMINGSOON';
-    const topRow: IBoarder[] = [{
-        type: 'boarder',
-        coordinate: [0, 0],
-    }];
-    const mainRow: ITile[] = [{
-        type: 'boarder',
-        coordinate: [0, 1],
-    }];
-    const mainRow2: ITile[] = [{
-        type: 'boarder',
-        coordinate: [0, 2],
-    }];
-    const bottomRow: IBoarder[] = [{
-        type: 'boarder',
-        coordinate: [0, 3],
-    }];
-    word.split('').forEach((c, idx) => {
-        topRow.push({
-            type: "boarder",
-            coordinate: [idx + 1, 0],
-        });
-        mainRow.push({
-            type: 'cell',
-            aHead: [1, 1],
-            dHead: [idx + 1, 1],
-            answer: c,
-            coordinate: [idx + 1, 1],
-        });
-        mainRow2.push({
-            type: 'cell',
-            aHead: [1, 2],
-            dHead: [idx + 1, 1],
-            answer: c,
-            coordinate: [idx + 1, 2],
-        });
-        bottomRow.push({
-            type: "boarder",
-            coordinate: [idx + 1, 3],
-        });
-    });
-    const len = word.length;
-    topRow.push({
-        type: "boarder",
-        coordinate: [len, 0],
-    });
-    mainRow.push({
-        type: 'boarder',
-        coordinate: [len, 1],
-    });
-    mainRow2.push({
-        type: 'boarder',
-        coordinate: [len, 2],
-    });
-    bottomRow.push({
-        type: "boarder",
-        coordinate: [len, 3],
-    });
+export class BoardMaker {
+    private input: string[][];
+    private currentAHead: ICoordinate | undefined;
+    private dHeads: (ICoordinate | undefined)[] = [];
 
-    return [
-        topRow,
-        mainRow,
-        mainRow2,
-        bottomRow,
-    ];
-    // const row1: ICell[] = [
-    //     {
-    //         type: 'cell',
-    //         aAnswer: 'ab',
-    //         dAnswer: 'ac',
-    //         aHead: [0, 0],
-    //         dHead: [0, 0],
-    //         coordinate: [0, 0],
-    //         answer: 'a',
-    //     },
-    //     {
-    //         type: 'cell',
-    //         aAnswer: 'ab',
-    //         dAnswer: 'bd',
-    //         aHead: [0, 0],
-    //         dHead: [1, 0],
-    //         coordinate: [1, 0],
-    //         answer: 'b',
-    //     }
-    // ];
-    // const row2: ICell[] = [{
-    //     type: 'cell',
-    //     aAnswer: 'cd',
-    //     dAnswer: 'ac',
-    //     aHead: [0, 1],
-    //     dHead: [0, 0],
-    //     coordinate: [0, 1],
-    //     answer: 'c',
-    // },
-    // {
-    //     type: 'cell',
-    //     aAnswer: 'cd',
-    //     dAnswer: 'bd',
-    //     aHead: [0, 1],
-    //     dHead: [1, 0],
-    //     coordinate: [1, 1],
-    //     answer: 'd',
-    // }];
-    // const row3: ITile[] = [
-    //     {
-    //         type: 'boarder',
-    //         coordinate: [0, 2],
-    //     },
-    //     {
-    //         type: 'boarder',
-    //         coordinate: [1, 2]
-    //     }
-    // ]
-    // return [row1, row2, row3];
+    constructor(input: string[][]) {
+        this.input = input;
+    }
+
+    public makeRows = (): ITile[][] => {
+        return this.input.map(this.processRow);
+    }
+
+    private processRow = (row: string[], x: number): ITile[] => {
+        this.currentAHead = undefined;
+        const rowOfTiles: ITile[] = row.map((cellVal, y) => {
+            const currentCoord: ICoordinate = [x, y];
+            const type = this.getCellType(cellVal);
+            return type === 'boarder' ? this.createBoarder(currentCoord) : this.createCell(currentCoord, cellVal);
+        });
+        return rowOfTiles;
+    }
+
+    private createCell = (coord: ICoordinate, answer: string): ICell => {
+        const [x, y] = coord;
+        if (!this.currentAHead) {
+            const a = this.input[x - 1]?.[y];
+            const b = this.input[x + 1]?.[y];
+            this.currentAHead = this.getHead(coord, a, b);
+        }
+        if (!this.dHeads[y]) {
+            const a = this.input[x]?.[y - 1];
+            const b = this.input[x]?.[y + 1];
+            this.dHeads[y] = this.getHead(coord, a, b);
+        }
+        return {
+            type: 'cell',
+            answer,
+            aHead: this.currentAHead,
+            dHead: this.dHeads[y],
+            coordinate: coord,
+        };
+    }
+
+    private getHead = (coord: ICoordinate, a?: string, b?: string): ICoordinate | undefined => {
+        let aType: ICellType = 'boarder';
+        if (a) aType = this.getCellType(a);
+        let bType: ICellType = 'boarder';
+        if (b) bType = this.getCellType(b);
+        if (aType === 'boarder' && bType === 'boarder') return undefined;
+        return coord;
+    }
+
+    private createBoarder = (coord: ICoordinate): IBoarder => {
+        const [x, y] = coord;
+        this.currentAHead = undefined;
+        this.dHeads[y] = undefined;
+        return {
+            type: 'boarder',
+            coordinate: coord,
+        };
+    }
+
+    private getCellType = (c: string): ICellType => {
+        if (c === '' || c === 'xx') return 'boarder';
+        if (c.length !== 1) throw new Error(`Invalid Cell! ${c}`);
+        return 'cell';
+    }
 }

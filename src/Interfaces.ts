@@ -1,8 +1,9 @@
 export type ICoordinate = [number, number];
 export type IOrientation = 'down' | 'across';
+export type ICellType = 'boarder' | 'cell';
 
 interface ITileCommon {
-    type: 'boarder' | 'cell',
+    type: ICellType,
     coordinate: ICoordinate,
 }
 export interface IBoarder extends ITileCommon {
