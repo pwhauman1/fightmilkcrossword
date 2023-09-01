@@ -38,7 +38,6 @@ class StoreReader {
     }
 
     public toggleOrientation(): IOrientation {
-        console.log('Toggling Orientation. It was', this.orientation);
         if (this.orientation === 'across') {
             this.orientation = 'down';
         }

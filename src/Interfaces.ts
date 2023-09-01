@@ -13,6 +13,7 @@ export interface ICell extends ITileCommon {
     aHead?: ICoordinate,
     dHead?: ICoordinate,
     answer: string,
+    id?: string,
 }
 export type ITile = ICell | IBoarder;
 
@@ -21,7 +22,12 @@ export interface IWordForConfig {
     clue: string,
     head: ICoordinate,
     relatedAnswers?: IWordForConfig['answer'][],
-    orientation: IOrientation
+    orientation: IOrientation,
 }
 
 export type IKeyType = 'char' | 'delete' | 'ignore';
+
+export interface IAnswerKey {
+    answer: string,
+    clue: string,
+}
