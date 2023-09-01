@@ -10,6 +10,7 @@
     export let aHead: ICoordinate | undefined = undefined;
     export let answer: string;
     export let coordinate: ICoordinate;
+    export let id: number | undefined = undefined;
 
     let me: HTMLInputElement;
     let unsubs: Unsubscriber[] = [];
@@ -28,8 +29,10 @@
             if (!event) return;
             const { head, orientation } = event;
             if (!head) return;
-            if (orientation === 'across') shouldHighlight = doCoordsEqual(aHead, head);
-            if (orientation === 'down') shouldHighlight = doCoordsEqual(dHead, head)
+            if (orientation === "across")
+                shouldHighlight = doCoordsEqual(aHead, head);
+            if (orientation === "down")
+                shouldHighlight = doCoordsEqual(dHead, head);
         });
         unsubs.push(nextFocusUnsub);
         unsubs.push(currentHeadUnsub);
@@ -55,13 +58,18 @@
     };
 </script>
 
-<input
-    bind:value
-    on:keyup={onkeyup}
-    on:click={onclick}
-    class:is-correct={shouldHighlight}
-    bind:this={me}
-/>
+<div class="container">
+    {#if id}
+        <div class="badge">{id}</div>
+    {/if}
+    <input
+        bind:value
+        on:keyup={onkeyup}
+        on:click={onclick}
+        class:is-correct={shouldHighlight}
+        bind:this={me}
+    />
+</div>
 
 <style>
     input {
@@ -73,5 +81,18 @@
     }
     .is-correct {
         background-color: yellow;
+    }
+    .container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .badge {
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: grey; /* Customize badge text color */
+        padding: 4px 8px; /* Adjust padding to control badge size */
+        font-size: 12px; /* Customize font size */
     }
 </style>

@@ -12,6 +12,13 @@ interface ICurrentHeadEvent {
 }
 export const currentHeadStore = writable<ICurrentHeadEvent | undefined>();
 
+/**
+ * TODO: there is no way to map a head to the clue :(
+ * Some ideas
+ * - when creating the board, add answers to cell info <-- this one works best?
+ * - when cells high light, organize word
+ */
+
 class StoreReader {
     private orientation: IOrientation = 'across';
     private currentHead: ICoordinate | undefined;
@@ -66,8 +73,6 @@ class StoreReader {
     public getCurrentCell(): ICoordinate | undefined {
         return this.selectedCell;
     }
-
-
 }
 
 export const storeReaderSingleton = StoreReader.get();

@@ -14,7 +14,7 @@ export interface ICell extends ITileCommon {
     aHead?: ICoordinate,
     dHead?: ICoordinate,
     answer: string,
-    id?: string,
+    id?: number,
 }
 export type ITile = ICell | IBoarder;
 

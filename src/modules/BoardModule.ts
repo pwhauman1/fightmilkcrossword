@@ -4,6 +4,7 @@ export class BoardMaker {
     private input: string[][];
     private currentAHead: ICoordinate | undefined;
     private dHeads: (ICoordinate | undefined)[] = [];
+    private nextId: number = 1;
 
     constructor(input: string[][]) {
         this.input = input;
@@ -25,6 +26,7 @@ export class BoardMaker {
 
     private createCell = (coord: ICoordinate, answer: string): ICell => {
         const [x, y] = coord;
+        const shouldAssignId = !this.currentAHead || !this.dHeads[y];
         if (!this.currentAHead) {
             const a = this.input[x - 1]?.[y];
             const b = this.input[x + 1]?.[y];
@@ -41,6 +43,7 @@ export class BoardMaker {
             aHead: this.currentAHead,
             dHead: this.dHeads[y],
             coordinate: coord,
+            id: shouldAssignId ? this.nextId++ : undefined
         };
     }
 
