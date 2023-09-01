@@ -2,11 +2,9 @@
     import Header from "./lib/Header.svelte";
     import Board from "./lib/Board.svelte";
     import { Csv, type IValidator } from "./modules/CSVModule";
-    import { onMount } from "svelte";
     import type { IAnswerKey } from "./Interfaces";
     let boardCsv: Csv<string[]>;
     let answerKeyCsv: Csv<IAnswerKey>;
-    let isBoardReadyPromise: Promise<unknown[]>;
 
     const boardValidator: IValidator<string[]> = (
         data: unknown
@@ -36,15 +34,13 @@
         return true;
     } 
 
-    onMount(() => {
-        const boardCsvSource = "/board.csv";
-        const answerKeyCsvSource = "/answerKey.csv";
-        boardCsv = new Csv(boardCsvSource, boardValidator, false);
-        const boardPromise = boardCsv.ingest();
-        answerKeyCsv = new Csv(answerKeyCsvSource, answerKeyValidator, true);
-        const answerKeyPromise = answerKeyCsv.ingest();
-        isBoardReadyPromise = Promise.all([boardPromise, answerKeyPromise]);
-    });
+    const boardCsvSource = "/board.csv";
+    const answerKeyCsvSource = "/answerKey.csv";
+    boardCsv = new Csv(boardCsvSource, boardValidator, false);
+    const boardPromise = boardCsv.ingest();
+    answerKeyCsv = new Csv(answerKeyCsvSource, answerKeyValidator, true);
+    const answerKeyPromise = answerKeyCsv.ingest();
+    const isBoardReadyPromise = Promise.all([boardPromise, answerKeyPromise]);
 </script>
 
 <main>
@@ -52,7 +48,7 @@
         {#await isBoardReadyPromise}
             <p>Loading...</p>
         {:then _} 
-            <Header />
+            <Header answerKey={answerKeyCsv.getCsv()}/>
             <Board />  
         {/await}
     </div>
