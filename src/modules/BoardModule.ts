@@ -1,17 +1,30 @@
-import type { IBoarder, ICell, ICellType, ICoordinate, ITile } from "../Interfaces";
+import type { IBoarder, ICell, ICellType, ICoordinate, IOrientation, ITile } from "../Interfaces";
 
-export class BoardMaker {
+export class BoardModule {
     private input: string[][];
     private currentAHead: ICoordinate | undefined;
     private dHeads: (ICoordinate | undefined)[] = [];
     private nextId: number = 1;
+    private answersMap: Map<string, string>;
+    private rows: ITile[][];
 
     constructor(input: string[][]) {
         this.input = input;
+        this.answersMap = new Map();
+        this.rows = this.makeRows(input);
     }
 
-    public makeRows = (): ITile[][] => {
-        return this.input.map(this.processRow);
+    public getRows = (): ITile[][] => {
+        return this.rows;
+    }
+
+    public getAnswer = (coord: ICoordinate, orientation: IOrientation): string | undefined => {
+        const key = this.getAnswersMapKey(coord, orientation);
+        return this.answersMap.get(key);
+    }
+
+    private makeRows = (input: string[][]): ITile[][] => {
+        return input.map(this.processRow);
     }
 
     private processRow = (row: string[], y: number): ITile[] => {
@@ -24,7 +37,7 @@ export class BoardMaker {
         return rowOfTiles;
     }
 
-    private createCell = (coord: ICoordinate, answer: string): ICell => {
+    private createCell = (coord: ICoordinate, cellAnswer: string): ICell => {
         const [x, y] = coord;
         const shouldAssignId = !this.currentAHead || !this.dHeads[y];
         if (!this.currentAHead) {
@@ -37,14 +50,29 @@ export class BoardMaker {
             const b = this.input[x]?.[y + 1];
             this.dHeads[y] = this.getHead(coord, a, b);
         }
+        this.updateAnswersMap(this.currentAHead, cellAnswer, 'across');
+        this.updateAnswersMap(this.dHeads[y], cellAnswer, 'down');
         return {
             type: 'cell',
-            answer,
+            answer: cellAnswer,
             aHead: this.currentAHead,
             dHead: this.dHeads[y],
             coordinate: coord,
             id: shouldAssignId ? this.nextId++ : undefined
         };
+    }
+
+    private getAnswersMapKey = (head: ICoordinate, orientation: IOrientation) => {
+        return `x${head[0]}y${head[1]}_${orientation}`;
+    }
+
+    private updateAnswersMap = (head: ICoordinate | undefined, cellAnswer: string, orientation: IOrientation) => {
+        if (!head) return;
+        const key = this.getAnswersMapKey(head, orientation);
+        let answer = this.answersMap.get(key);
+        if (!answer) answer = '';
+        answer += cellAnswer;
+        this.answersMap.set(key, answer);
     }
 
     private getHead = (coord: ICoordinate, a?: string, b?: string): ICoordinate | undefined => {

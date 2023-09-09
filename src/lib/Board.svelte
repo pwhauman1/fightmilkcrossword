@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { BoardMaker } from "../modules/BoardModule";
+    import { BoardModule } from "../modules/BoardModule";
     import Row from "./Row.svelte";
-    export let board: string[][];
-    const rows = new BoardMaker(board).makeRows();
+    export let board: BoardModule;
+    const rows = board.getRows();
 </script>
 
 {#each rows as row }

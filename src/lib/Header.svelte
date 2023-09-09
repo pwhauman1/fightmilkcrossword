@@ -1,26 +1,31 @@
 <script lang="ts">
     import type { IAnswerKey } from "../Interfaces";
+    import type { BoardModule } from "../modules/BoardModule";
+    import { currentHeadStore, storeReaderSingleton } from "../modules/Stores";
 
     export let answerKey: IAnswerKey[];
-    const answers = answerKey.map(e => e.answer);
+    export let board: BoardModule;
     const answerKeyMap = new Map<string, string>();
     answerKey.forEach(e => {
-        if (answerKeyMap.get(e.answer)) throw new Error(`DUPLICATE ANSWER ${e}`)
+        if (answerKeyMap.has(e.answer)) throw new Error(`DUPLICATE ANSWER ${e}`)
         answerKeyMap.set(e.answer, e.clue);
     });
-    let clue: string | undefined;
-    setInterval(() => {
-        const idx = Math.floor(Math.random() * (answers.length+1));
-        const a = answers[idx];
-        clue = answerKeyMap.get(a);
-    }, 1500);
-
+    let clueToShow: string = 'Click a cell you dummy!';
+    currentHeadStore.subscribe((event) => {
+        if (!event || !event.head) return;
+        const headCoord = event.head;
+        const orientation = storeReaderSingleton.getOrientation();
+        const answer = board.getAnswer(headCoord, orientation);
+        if (!answer) return;
+        const clue = answerKeyMap.get(answer);
+        if (!clue) {
+            throw new Error(`UNKNOWN ANSWER: ${answer}. For head ${headCoord}`);
+        };
+        clueToShow = clue;
+    })
+    
 </script>
 
 <h1>
-    {#if clue}
-        {clue}
-    {:else}
-        Click a cell you dummy
-    {/if}
+    {clueToShow}
 </h1>

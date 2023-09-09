@@ -3,6 +3,7 @@
     import Board from "./lib/Board.svelte";
     import { Csv, type IValidator } from "./modules/CSVModule";
     import type { IAnswerKey } from "./Interfaces";
+    import { BoardModule } from "./modules/BoardModule";
     let boardCsv: Csv<string[]>;
     let answerKeyCsv: Csv<IAnswerKey>;
 
@@ -43,6 +44,11 @@
     const answerKeyPromise = answerKeyCsv.ingest();
     
     const isBoardReadyPromise = Promise.all([boardPromise, answerKeyPromise]);
+    let board: BoardModule;
+    boardPromise.then(() => {
+        const boardCsvContent = boardCsv.getCsv();
+        board = new BoardModule(boardCsvContent);
+    });
 </script>
 
 <main>
@@ -50,8 +56,8 @@
         {#await isBoardReadyPromise}
             <p>Loading...</p>
         {:then _} 
-            <Header answerKey={answerKeyCsv.getCsv()}/>
-            <Board board={boardCsv.getCsv()}/>  
+            <Header answerKey={answerKeyCsv.getCsv()} board={board}/>
+            <Board board={board}/>  
         {/await}
     </div>
 </main>
