@@ -14,9 +14,9 @@ export class BoardMaker {
         return this.input.map(this.processRow);
     }
 
-    private processRow = (row: string[], x: number): ITile[] => {
+    private processRow = (row: string[], y: number): ITile[] => {
         this.currentAHead = undefined;
-        const rowOfTiles: ITile[] = row.map((cellVal, y) => {
+        const rowOfTiles: ITile[] = row.map((cellVal, x) => {
             const currentCoord: ICoordinate = [x, y];
             const type = this.getCellType(cellVal);
             return type === 'boarder' ? this.createBoarder(currentCoord) : this.createCell(currentCoord, cellVal);

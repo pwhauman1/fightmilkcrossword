@@ -66,7 +66,7 @@
         bind:value
         on:keyup={onkeyup}
         on:click={onclick}
-        class:is-correct={shouldHighlight}
+        class:should-highlight={shouldHighlight}
         bind:this={me}
     />
 </div>
@@ -79,7 +79,7 @@
         caret-color: transparent;
         text-align: center;
     }
-    .is-correct {
+    .should-highlight {
         background-color: yellow;
     }
     .container {

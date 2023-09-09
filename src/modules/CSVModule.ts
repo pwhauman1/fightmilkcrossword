@@ -41,7 +41,6 @@ export class Csv<T> {
             throw new Error('Parse Error');
         }
         if (this.validator) res.data.map(this.validator);
-        console.log(`${this.path} returned ${res.data.length} items`)
         this.csv = res.data;
     }
 

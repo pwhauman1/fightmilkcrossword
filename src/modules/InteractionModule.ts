@@ -66,9 +66,9 @@ export function onCellInput(props: IOnCellInput): void {
 
     const or = storeReaderSingleton.getOrientation();
     if (keyType === 'delete') {
-        const nextCoord = getPreviousCell(coordinate, or);
+        const prevCoord = getPreviousCell(coordinate, or);
         selectedCellStore.set({
-            coordinate: nextCoord,
+            coordinate: prevCoord,
             clear: true,
         });
     }
