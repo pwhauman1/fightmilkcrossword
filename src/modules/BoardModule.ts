@@ -39,24 +39,24 @@ export class BoardModule {
 
     private createCell = (coord: ICoordinate, cellAnswer: string): ICell => {
         const [x, y] = coord;
-        const shouldAssignId = !this.currentAHead || !this.dHeads[y];
+        const shouldAssignId = !this.currentAHead || !this.dHeads[x];
         if (!this.currentAHead) {
             const a = this.input[x - 1]?.[y];
             const b = this.input[x + 1]?.[y];
             this.currentAHead = this.getHead(coord, a, b);
         }
-        if (!this.dHeads[y]) {
+        if (!this.dHeads[x]) {
             const a = this.input[x]?.[y - 1];
             const b = this.input[x]?.[y + 1];
-            this.dHeads[y] = this.getHead(coord, a, b);
+            this.dHeads[x] = this.getHead(coord, a, b);
         }
         this.updateAnswersMap(this.currentAHead, cellAnswer, 'across');
-        this.updateAnswersMap(this.dHeads[y], cellAnswer, 'down');
+        this.updateAnswersMap(this.dHeads[x], cellAnswer, 'down');
         return {
             type: 'cell',
             answer: cellAnswer,
             aHead: this.currentAHead,
-            dHead: this.dHeads[y],
+            dHead: this.dHeads[x],
             coordinate: coord,
             id: shouldAssignId ? this.nextId++ : undefined
         };
@@ -87,7 +87,7 @@ export class BoardModule {
     private createBoarder = (coord: ICoordinate): IBoarder => {
         const [x, y] = coord;
         this.currentAHead = undefined;
-        this.dHeads[y] = undefined;
+        this.dHeads[x] = undefined;
         return {
             type: 'boarder',
             coordinate: coord,

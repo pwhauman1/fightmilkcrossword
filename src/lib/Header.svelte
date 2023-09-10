@@ -22,7 +22,7 @@
             throw new Error(`UNKNOWN ANSWER: ${answer}. For head ${headCoord}`);
         };
         clueToShow = clue;
-    })
+    });
     
 </script>
 
