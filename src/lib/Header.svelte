@@ -6,11 +6,12 @@
     export let answerKey: IAnswerKey[];
     export let board: BoardModule;
     const answerKeyMap = new Map<string, string>();
-    answerKey.forEach(e => {
-        if (answerKeyMap.has(e.answer)) throw new Error(`DUPLICATE ANSWER ${e}`)
+    answerKey.forEach((e) => {
+        if (answerKeyMap.has(e.answer))
+            throw new Error(`DUPLICATE ANSWER ${e}`);
         answerKeyMap.set(e.answer, e.clue);
     });
-    let clueToShow: string = 'Click a cell you dummy!';
+    let clueToShow: string = "Click a cell you dummy!";
     currentHeadStore.subscribe((event) => {
         if (!event || !event.head) return;
         const headCoord = event.head;
@@ -20,12 +21,24 @@
         const clue = answerKeyMap.get(answer);
         if (!clue) {
             throw new Error(`UNKNOWN ANSWER: ${answer}. For head ${headCoord}`);
-        };
+        }
         clueToShow = clue;
     });
-    
 </script>
 
-<h1>
-    {clueToShow}
-</h1>
+<div class="sticky-header">
+    <h2>
+        {clueToShow}
+    </h2>
+</div>
+
+<style>
+    .sticky-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #3ac115; 
+        z-index: 999
+    }
+</style>

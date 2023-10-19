@@ -66,6 +66,7 @@
             <p>Loading...</p>
         {:then _} 
             <Header answerKey={answerKeyCsv.getCsv()} board={board}/>
+            <br>
             <Board board={board}/>  
         {/await}
     </div>

@@ -8,8 +8,8 @@
 
 <style>
     input {
-        height: 30px;
-        width: 30px;
+        height: 25px;
+        width: 25px;
         cursor: not-allowed;
         caret-color: transparent;
         background-color: black;

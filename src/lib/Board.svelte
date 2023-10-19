@@ -5,9 +5,15 @@
     const rows = board.getRows();
 </script>
 
-{#each rows as row }
-    <Row tiles={row}/>
-    <br>
-{/each}
+<div class="board">
+    {#each rows as row}
+        <Row tiles={row} />
+        <br />
+    {/each}
+</div>
 
-
+<style>
+    .board {
+        padding-top: 30px;
+    }
+</style>

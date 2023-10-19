@@ -73,8 +73,8 @@
 
 <style>
     input {
-        height: 30px;
-        width: 30px;
+        height: 25px;
+        width: 25px;
         cursor: pointer;
         caret-color: transparent;
         text-align: center;
@@ -93,6 +93,6 @@
         left: 0;
         color: grey; /* Customize badge text color */
         padding: 4px 8px; /* Adjust padding to control badge size */
-        font-size: 12px; /* Customize font size */
+        font-size: 8px; /* Customize font size */
     }
 </style>
