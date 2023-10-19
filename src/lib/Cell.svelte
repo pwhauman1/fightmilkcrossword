@@ -56,11 +56,22 @@
             coordinate,
         });
     };
+    const onBadgeClick = () => {
+        me.focus();
+        onclick();
+    }
 </script>
 
 <div class="container">
     {#if id}
-        <div class="badge">{id}</div>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <div 
+            class="badge"
+            on:click={onBadgeClick}
+        >
+            {id}
+        </div>
     {/if}
     <input
         bind:value
