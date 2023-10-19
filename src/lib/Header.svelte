@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { IAnswerKey } from "../Interfaces";
     import type { BoardModule } from "../modules/BoardModule";
+    import { scrubClue } from "../modules/ClueScrubber";
     import { currentHeadStore, storeReaderSingleton } from "../modules/Stores";
 
     export let answerKey: IAnswerKey[];
@@ -22,7 +23,7 @@
         if (!clue) {
             throw new Error(`UNKNOWN ANSWER: ${answer}. For head ${headCoord}`);
         }
-        clueToShow = clue;
+        clueToShow = scrubClue(clue);
     });
 </script>
 

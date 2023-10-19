@@ -23,6 +23,7 @@
     "vite": "^4.4.5"
   },
   "dependencies": {
-    "papaparse": "^5.4.1"
+    "papaparse": "^5.4.1",
+    "svelte-error-boundary": "^1.0.2"
   }
 }

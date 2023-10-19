@@ -14,7 +14,8 @@
 
     let me: HTMLInputElement;
     let unsubs: Unsubscriber[] = [];
-    let value = "";
+    const showCheat = location.hash === '#cheat'
+    let value = showCheat ? answer : '';
     let shouldHighlight = false;
     onMount(() => {
         const nextFocusUnsub = selectedCellStore.subscribe((event) => {
