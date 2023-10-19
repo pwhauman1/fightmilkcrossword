@@ -3,7 +3,7 @@
     import { type ICoordinate } from "../Interfaces";
     import { currentHeadStore, selectedCellStore } from "../modules/Stores";
     import { onCellClick, onCellInput } from "../modules/InteractionModule";
-    import { doCoordsEqual } from "../modules/Utils";
+    import { doCoordsEqual, isFlagOn } from "../modules/Utils";
     import type { Unsubscriber } from "svelte/store";
     export const type = "cell";
     export let dHead: ICoordinate | undefined = undefined;
@@ -14,8 +14,7 @@
 
     let me: HTMLInputElement;
     let unsubs: Unsubscriber[] = [];
-    const showCheat = location.hash === '#cheat'
-    let value = showCheat ? answer : '';
+    let value = isFlagOn('cheat') ? answer : '';
     let shouldHighlight = false;
     onMount(() => {
         const nextFocusUnsub = selectedCellStore.subscribe((event) => {

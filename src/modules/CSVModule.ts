@@ -1,4 +1,5 @@
 import { parse, type ParseResult } from 'papaparse';
+import { AlertError } from './Utils';
 
 export type IValidator = (data: unknown) => true | string;
 
@@ -18,7 +19,7 @@ export class Csv<T> {
         if (validator) {
             this.validator = (data: unknown) => {
                 const isValid = validator(data);
-                if (isValid !== true) throw new Error(`Invalid cell in ${this.path}. ${isValid}: ${JSON.stringify(data)}`)
+                if (isValid !== true) throw new AlertError(`Invalid cell in ${this.path}. ${isValid}: ${JSON.stringify(data)}`)
             }
         }
     }
@@ -44,7 +45,7 @@ export class Csv<T> {
         })
         if (actualErrs.length) {
             console.error(actualErrs);
-            throw new Error('Parse Error');
+            throw new AlertError('Parse Error');
         }
         if (this.validator) res.data.map(this.validator);
         this.csv = res.data;

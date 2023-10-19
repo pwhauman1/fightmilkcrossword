@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { IAnswerKey } from "../Interfaces";
+    import { AlertError } from "../modules/Utils";
     import type { BoardModule } from "../modules/BoardModule";
     import { scrubClue } from "../modules/ClueScrubber";
     import { currentHeadStore, storeReaderSingleton } from "../modules/Stores";
@@ -9,7 +10,7 @@
     const answerKeyMap = new Map<string, string>();
     answerKey.forEach((e) => {
         if (answerKeyMap.has(e.answer))
-            throw new Error(`DUPLICATE ANSWER ${e}`);
+            throw new AlertError(`DUPLICATE ANSWER ${e}`);
         answerKeyMap.set(e.answer, e.clue);
     });
     let clueToShow: string = "Click a cell you dummy!";
@@ -21,7 +22,7 @@
         if (!answer) return;
         const clue = answerKeyMap.get(answer);
         if (!clue) {
-            throw new Error(`UNKNOWN ANSWER: ${answer}. For head ${headCoord}`);
+            throw new AlertError(`UNKNOWN ANSWER: ${answer}. For head ${headCoord}`);
         }
         clueToShow = scrubClue(clue);
     });

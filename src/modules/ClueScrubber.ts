@@ -1,3 +1,5 @@
+import { AlertError } from "./Utils";
+
 export function scrubClue(clue: string): string {
     if (!shouldScrubBrackets(clue)) return clue;
     let scrubbedClue = '';
@@ -23,7 +25,7 @@ export function shouldScrubBrackets(clue: string): boolean {
     const leftBracketsNum = clue.match(/\[/g)?.length;
     const rightBracketsNum = clue.match(/\[/g)?.length;
     if (leftBracketsNum !== rightBracketsNum) {
-        throw new Error(`Invalid clue format. L Brackets: ${leftBracketsNum}, R Brackets: ${rightBracketsNum} for clue "${clue}"`);
+        throw new AlertError(`Invalid clue format. L Brackets: ${leftBracketsNum}, R Brackets: ${rightBracketsNum} for clue "${clue}"`);
     }
     return !!leftBracketsNum;
 }

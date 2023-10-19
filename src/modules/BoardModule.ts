@@ -1,4 +1,5 @@
 import type { IBoarder, ICell, ICellType, ICoordinate, IOrientation, ITile } from "../Interfaces";
+import { AlertError } from "./Utils";
 
 export class BoardModule {
     private input: string[][];
@@ -96,7 +97,7 @@ export class BoardModule {
 
     private getCellType = (c: string): ICellType => {
         if (c === '' || c === 'xx') return 'boarder';
-        if (c.length !== 1) throw new Error(`Invalid Cell! ${c}`);
+        if (c.length !== 1) throw new AlertError(`Invalid Cell! ${c}`);
         return 'cell';
     }
 }

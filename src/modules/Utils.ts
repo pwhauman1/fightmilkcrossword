@@ -20,3 +20,25 @@ export function getKeyType(key: string): IKeyType {
     }
     return 'ignore';
 }
+
+export function isFlagOn(flag: string): boolean{
+    const hashWithoutHashChar = location.hash.slice(1);
+    const flags = hashWithoutHashChar.split('_');
+    return !!flags.find(f => f === flag);
+}
+
+export class AlertError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'Utils';
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, AlertError);
+        }
+        if (isFlagOn('alerterrors')) {
+            this.displayAlert();
+        }
+    }
+    displayAlert = () => {
+        window.alert(this.message);
+    }
+}
