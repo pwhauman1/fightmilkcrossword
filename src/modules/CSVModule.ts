@@ -1,6 +1,6 @@
 import { parse, type ParseResult } from 'papaparse';
 
-export type IValidator<T> = (data: unknown) => data is T;
+export type IValidator = (data: unknown) => true | string;
 
 /**
  * If headers are not present, res.data is a double array of strings.
@@ -12,13 +12,13 @@ export class Csv<T> {
     private isRead = false;
     private areHeadersPresent = false;
     private validator?: (data: unknown) => void;
-    constructor(path: string, validator?: IValidator<T>, areHeadersPresent?: boolean) {
+    constructor(path: string, validator?: IValidator, areHeadersPresent?: boolean) {
         this.path = path;
         this.areHeadersPresent = !!areHeadersPresent;
         if (validator) {
             this.validator = (data: unknown) => {
                 const isValid = validator(data);
-                if (!isValid) throw new Error(`Invalid cell in ${this.path}: ${JSON.stringify(data)}`);
+                if (isValid !== true) throw new Error(`Invalid cell in ${this.path}. ${isValid}: ${JSON.stringify(data)}`)
             }
         }
     }
@@ -29,7 +29,13 @@ export class Csv<T> {
         parse<T>(data, {
             header: this.areHeadersPresent,
             complete: this.onParse,
+            delimitersToGuess: ['|', '\t'],
+            transform: this.trimCell,
+            transformHeader: this.trimCell,
         });
+    }
+    private trimCell = (cell: string): string => {
+        return cell.trim();
     }
     private onParse = (res: ParseResult<T>): void => {
         console.log(`Finished parsing ${this.path}`);

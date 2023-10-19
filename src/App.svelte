@@ -7,31 +7,40 @@
     let boardCsv: Csv<string[]>;
     let answerKeyCsv: Csv<IAnswerKey>;
 
-    const boardValidator: IValidator<string[]> = (
+    const boardValidator: IValidator = (
         data: unknown
-    ): data is string[] => {
-        if (!Array.isArray(data)) return false;
-        let allGood = true;
+    ): string | true => {
+        if (!Array.isArray(data)) return 'Data is not an array!';
+        let reason: string | undefined = undefined;
         data.forEach((e: unknown) => {
+            // if reason was previously set, don't continue
+            // JS has no `break` functionality
+            if (reason) return;
             if (typeof e !== "string") {
-                allGood = false;
+                reason = `${JSON.stringify(e)} is not a string!`
                 return;
             }
             const isBoarder = e === 'xx';
             const isEmpty = e === '';
             const isLetter = e.length === 1;
-            allGood = isBoarder || isEmpty || isLetter;
+            if (!(isBoarder || isEmpty || isLetter)) {
+                reason = `${JSON.stringify(e)} is not a cell or border!`
+            }
         });
-        return allGood;
+        return reason || true;
     };
 
-    const answerKeyValidator: IValidator<IAnswerKey> = (
+    const answerKeyValidator: IValidator = (
         data: unknown
-    ): data is IAnswerKey => {
-        if (typeof data !== 'object') return false;
-        if (!data) return false;
-        if (!('clue' in data)) return false;
-        if (!('answer' in data)) return false;
+    ): string | true => {
+        const strData = JSON.stringify(data);
+        if (typeof data !== 'object') return strData + ' is not an object!';
+        if (!data) return strData + ' is falsy!';
+        if (!('clue' in data)) return strData + ' does not have a clue!';
+        if (!('answer' in data)) return strData + ' does not have an answer!';
+        if (!((data.answer as string).match(/[a-zA-Z]+/))) {
+            return strData + ' does not format answer correctly!';
+        }
         return true;
     } 
 
