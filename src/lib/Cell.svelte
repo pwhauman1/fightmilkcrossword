@@ -5,6 +5,7 @@
     import { onCellClick, onCellInput } from "../modules/InteractionModule";
     import { doCoordsEqual, isFlagOn } from "../modules/Utils";
     import type { Unsubscriber } from "svelte/store";
+    import { stateModule } from "../modules/StateModule";
     export const type = "cell";
     export let dHead: ICoordinate | undefined = undefined;
     export let aHead: ICoordinate | undefined = undefined;
@@ -14,9 +15,11 @@
 
     let me: HTMLInputElement;
     let unsubs: Unsubscriber[] = [];
-    let value = isFlagOn('cheat') ? answer : '';
+    let value = '';
     let shouldHighlight = false;
     onMount(() => {
+        value = stateModule.get(coordinate);
+        if (isFlagOn('cheat')) value = answer;
         const nextFocusUnsub = selectedCellStore.subscribe((event) => {
             if (!event) return;
             if (!doCoordsEqual(event.coordinate, coordinate)) return;
@@ -47,7 +50,7 @@
         if (value.length > 1) {
             value = value.slice(-1);
         }
-        onCellInput({ coordinate, key: e.key });
+        onCellInput({ coordinate, pressedKey: e.key });
     };
     const onclick = () => {
         onCellClick({

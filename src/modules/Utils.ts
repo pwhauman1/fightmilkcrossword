@@ -20,6 +20,7 @@ export function toggleOrientation(or: IOrientation): IOrientation {
 export function getKeyType(key: string): IKeyType {
     const upperCasedKey = key.toLocaleUpperCase();
     if (upperCasedKey === 'BACKSPACE' || upperCasedKey === 'DELETE') return 'delete';
+    if (upperCasedKey.length !== 1) return 'ignore';
     const charRegExp = /^[A-Z]|[1-9]$/;
     const matches = upperCasedKey.match(charRegExp);
     if (matches?.length) {

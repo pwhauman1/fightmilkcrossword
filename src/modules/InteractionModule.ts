@@ -1,5 +1,6 @@
 import type { ICoordinate, IOrientation } from "../Interfaces";
 import { BoardSingleton } from "./BoardModule";
+import { stateModule } from "./StateModule";
 import {
     selectedCellStore,
     currentHeadStore,
@@ -57,16 +58,17 @@ export function onCellClick(props: IOnCellClick): void {
 
 interface IOnCellInput {
     coordinate: ICoordinate,
-    key: string,
+    pressedKey: string,
 }
 export function onCellInput(props: IOnCellInput): void {
-    const { coordinate, key } = props;
-    const keyType = getKeyType(key);
+    const { coordinate, pressedKey } = props;
+    const keyType = getKeyType(pressedKey);
 
     if (keyType === 'ignore') return;
 
     const or = storeReaderSingleton.getOrientation();
     if (keyType === 'delete') {
+        stateModule.remove(coordinate);
         const prevCoord = getPreviousCell(coordinate, or);
         selectedCellStore.set({
             coordinate: prevCoord,
@@ -75,6 +77,7 @@ export function onCellInput(props: IOnCellInput): void {
     }
 
     if (keyType === 'char') {
+        stateModule.write(coordinate, pressedKey);
         let nextCoord = getNextCell(coordinate, or);
         if (!BoardSingleton.isBoarder(nextCoord)) {
             selectedCellStore.set({
@@ -89,7 +92,6 @@ export function onCellInput(props: IOnCellInput): void {
             coordinate: nextCoord,
             aHead: BoardSingleton.getHead(nextCoord, 'across'),
             dHead: BoardSingleton.getHead(nextCoord, 'down'),
-        })
-        
+        });
     }
 }
