@@ -29,8 +29,10 @@ export class BoardModule {
     }
 
     private processRow = (row: string[], y: number): ITile[] => {
+        console.log('Process row y:', y);
         this.currentAHead = undefined;
         const rowOfTiles: ITile[] = row.map((cellVal, x) => {
+            console.log('Going through x', x, cellVal);
             const currentCoord: ICoordinate = [x, y];
             const type = this.getCellType(cellVal);
             return type === 'boarder' ? this.createBoarder(currentCoord) : this.createCell(currentCoord, cellVal);
@@ -40,16 +42,20 @@ export class BoardModule {
 
     private createCell = (coord: ICoordinate, cellAnswer: string): ICell => {
         const [x, y] = coord;
-        const shouldAssignId = !this.currentAHead || !this.dHeads[x];
+        let shouldAssignId = false;
         if (!this.currentAHead) {
-            const a = this.input[x - 1]?.[y];
-            const b = this.input[x + 1]?.[y];
-            this.currentAHead = this.getHead(coord, a, b);
+            const a = this.input[y]?.[x - 1];
+            const b = this.input[y]?.[x + 1];
+            const newHead = this.getHead(coord, a, b);
+            if (newHead) shouldAssignId = true;
+            this.currentAHead = newHead;
         }
         if (!this.dHeads[x]) {
-            const a = this.input[x]?.[y - 1];
-            const b = this.input[x]?.[y + 1];
-            this.dHeads[x] = this.getHead(coord, a, b);
+            const a = this.input[y - 1]?.[x];
+            const b = this.input[y + 1]?.[x];
+            const newHead = this.getHead(coord, a, b);
+            if (newHead) shouldAssignId = true;
+            this.dHeads[x] = newHead;
         }
         this.updateAnswersMap(this.currentAHead, cellAnswer, 'across');
         this.updateAnswersMap(this.dHeads[x], cellAnswer, 'down');
