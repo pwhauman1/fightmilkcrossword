@@ -1,4 +1,5 @@
 import type { ICoordinate, IOrientation } from "../Interfaces";
+import { BoardSingleton } from "./BoardModule";
 import {
     selectedCellStore,
     currentHeadStore,
@@ -8,10 +9,10 @@ import { doCoordsEqual, getKeyType } from "./Utils";
 
 function getNextCell(coordinate: ICoordinate, or: IOrientation): ICoordinate {
     const [x, y] = coordinate;
-    const nextCoord = or === 'across'
+    const nextCoord: ICoordinate = or === 'across'
         ? [x + 1, y]
         : [x, y + 1];
-    return nextCoord as ICoordinate;
+    return nextCoord;
 }
 
 function getPreviousCell(coordinate: ICoordinate, or: IOrientation): ICoordinate {
@@ -74,10 +75,21 @@ export function onCellInput(props: IOnCellInput): void {
     }
 
     if (keyType === 'char') {
-        const nextCoord = getNextCell(coordinate, or);
-        selectedCellStore.set({
+        let nextCoord = getNextCell(coordinate, or);
+        if (!BoardSingleton.isBoarder(nextCoord)) {
+            selectedCellStore.set({
+                coordinate: nextCoord,
+                clear: false,
+            });
+            return;
+        }
+        // if the next cell would be a boarder, simulate clicking
+        nextCoord = BoardSingleton.getNextHead(coordinate, or);
+        onCellClick({
             coordinate: nextCoord,
-            clear: false,
-        });
+            aHead: BoardSingleton.getHead(nextCoord, 'across'),
+            dHead: BoardSingleton.getHead(nextCoord, 'down'),
+        })
+        
     }
 }

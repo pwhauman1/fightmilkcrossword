@@ -1,5 +1,5 @@
 import type { IBoarder, ICell, ICellType, ICoordinate, IOrientation, ITile } from "../Interfaces";
-import { AlertError } from "./Utils";
+import { AlertError, doCoordsEqual, toggleOrientation } from "./Utils";
 
 export class BoardModule {
     private input: string[][];
@@ -7,12 +7,24 @@ export class BoardModule {
     private dHeads: (ICoordinate | undefined)[] = [];
     private nextId: number = 1;
     private answersMap: Map<string, string>;
+    /**
+     * y is first dimension
+     */
     private rows: ITile[][];
 
-    constructor(input: string[][]) {
+    public constructor(input: string[][]) {
         this.input = input;
         this.answersMap = new Map();
         this.rows = this.makeRows(input);
+    }
+
+    ///////////////////
+    // Basic Getters //
+    ///////////////////
+
+    public getCell = (coord: ICoordinate): ITile => {
+        const [x, y] = coord;
+        return this.rows[y][x];
     }
 
     public getRows = (): ITile[][] => {
@@ -23,6 +35,25 @@ export class BoardModule {
         const key = this.getAnswersMapKey(coord, orientation);
         return this.answersMap.get(key);
     }
+
+    public getNextHead = (start: ICoordinate, or: IOrientation): ICoordinate | undefined => {
+        const [startX, startY] = start;
+        const headKey = or === 'across' ? 'aHead' : 'dHead';
+        let x = startX
+        for (let y = startY; y < this.rows.length, y++;) {
+            for(; x < this.rows[y].length, x++;) {
+                const cell = this.getCell([x, y]);
+                if (cell.type === 'boarder') continue;
+                const h = cell[headKey];
+                if (h) return h;
+            }
+            x = 0;
+        }
+    }
+
+    ////////////////////////////////////
+    // Methods for board construction //
+    ////////////////////////////////////
 
     private makeRows = (input: string[][]): ITile[][] => {
         return input.map(this.processRow);
@@ -105,5 +136,38 @@ export class BoardModule {
         if (c === '' || c === 'xx') return 'boarder';
         if (c.length !== 1) throw new AlertError(`Invalid Cell! ${c}`);
         return 'cell';
+    }
+}
+
+export class BoardSingleton {
+    private static board: BoardModule | undefined; 
+    private constructor() {};
+    public static set = (b: BoardModule) => {
+        if (this.board) throw new AlertError('BoardSingleton already set!')
+        this.board = b;
+    }
+    public static get = (): BoardModule => {
+        if (!this.board) throw new AlertError('BoardSingleton never set!');
+        return this.board as BoardModule;
+    }
+    public static isBoarder = (coord: ICoordinate) => {
+        const cell = this.board?.getCell(coord);
+        if (!cell) return true;
+        return cell.type === 'boarder';
+    }
+    public static getNextHead = (start: ICoordinate, or: IOrientation): ICoordinate => {
+        if (!this.board) throw new AlertError('BoardSingleton never set!');
+        const startsHead = this.getHead(start, or);
+        if (!startsHead) return start;
+        let nextHead = this.board.getNextHead(startsHead, or);
+        if (nextHead) return nextHead;
+        // commented out b/c rn there is no way to update everyone when OR changes
+        return start;
+    }
+    public static getHead(coord: ICoordinate, or: IOrientation): ICoordinate | undefined {
+        if (!this.board) throw new AlertError('BoardSingleton never set!');
+        const cell = this.board.getCell(coord);
+        if (cell.type === 'boarder') return undefined;
+        return or === 'across' ? cell.aHead : cell.dHead;
     }
 }

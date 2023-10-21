@@ -3,7 +3,7 @@
     import Board from "./lib/Board.svelte";
     import { Csv, type IValidator } from "./modules/CSVModule";
     import type { IAnswerKey } from "./Interfaces";
-    import { BoardModule } from "./modules/BoardModule";
+    import { BoardModule, BoardSingleton } from "./modules/BoardModule";
     let boardCsv: Csv<string[]>;
     let answerKeyCsv: Csv<IAnswerKey>;
 
@@ -57,6 +57,7 @@
     boardPromise.then(() => {
         const boardCsvContent = boardCsv.getCsv();
         board = new BoardModule(boardCsvContent);
+        BoardSingleton.set(board);
     });
 </script>
 

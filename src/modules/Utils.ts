@@ -1,4 +1,4 @@
-import type { ICoordinate, IKeyType } from "../Interfaces";
+import type { ICoordinate, IKeyType, IOrientation } from "../Interfaces";
 
 export function doCoordsEqual(c1?: ICoordinate, c2?: ICoordinate) {
     // yes, even if both are undefined. Then there are no coordinates
@@ -8,6 +8,13 @@ export function doCoordsEqual(c1?: ICoordinate, c2?: ICoordinate) {
     const [x1, y1] = c1;
     const [x2, y2] = c2;
     return (x1 === x2) && (y1 === y2);
+}
+
+export function toggleOrientation(or: IOrientation): IOrientation {
+    if (or === 'across') {
+        return 'down';
+    }
+    return 'across';
 }
 
 export function getKeyType(key: string): IKeyType {
