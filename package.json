@@ -8,8 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "gh-publish": "git checkout public-page && git merge main && git push && git checkout main",
-    "clean": "rm -Recurse ./docs"
+    "buildForGh": "npm run build && npm run clean",
+    "moveToPublishBranch": "git checkout public-page && git merge main",
+    "pubAndMoveToMain": "git push && git checkout main",
+    "gh-publish": "npm run moveToPublishBranch && npm run buildForGh && npm run pubAndMoveToMain",
+    "clean": "rmdir /s /q docs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",
