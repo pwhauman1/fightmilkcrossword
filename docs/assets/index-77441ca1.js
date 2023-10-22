@@ -2261,6 +2261,7 @@ class Csv {
   validator;
   constructor(path, validator, areHeadersPresent) {
     this.path = path;
+    console.log("🚀 ~ file: CSVModule.ts:18 ~ Csv<T> ~ constructor ~ path:", path);
     this.areHeadersPresent = !!areHeadersPresent;
     if (validator) {
       this.validator = (data) => {
@@ -2507,8 +2508,8 @@ function create_fragment(ctx) {
 	};
 }
 
-const boardCsvSource = "/board.csv";
-const answerKeyCsvSource = "/answerKey.csv";
+const boardCsvSource = "./board.csv";
+const answerKeyCsvSource = "./answerKey.csv";
 
 function instance($$self, $$props, $$invalidate) {
 	let isLoading = true;
