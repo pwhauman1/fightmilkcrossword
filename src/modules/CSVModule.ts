@@ -18,6 +18,7 @@ export class Csv<T> {
         this.areHeadersPresent = !!areHeadersPresent;
         if (validator) {
             this.validator = (data: unknown) => {
+                console.log('Validating:', data);
                 const isValid = validator(data);
                 if (isValid !== true) throw new AlertError(`Invalid cell in ${this.path}. ${isValid}: ${JSON.stringify(data)}`)
             }
@@ -27,6 +28,7 @@ export class Csv<T> {
         if (this.isRead) return;
         const res = await fetch(this.path);
         const data = await res.text();
+        console.log('Read Data', {data});
         parse<T>(data, {
             header: this.areHeadersPresent,
             complete: this.onParse,
