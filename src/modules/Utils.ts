@@ -43,10 +43,9 @@ export class AlertError extends Error {
             Error.captureStackTrace(this, AlertError);
         }
         if (isFlagOn('alerterrors')) {
-            this.displayAlert();
+            window.alert(this.message);
+        } else {
+            window.alert('Something Went Wrong. Refresh the page! (and tell Peter where you clicked)');
         }
-    }
-    displayAlert = () => {
-        window.alert(this.message);
     }
 }

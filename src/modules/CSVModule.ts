@@ -39,7 +39,6 @@ export class Csv<T> {
         return cell.trim();
     }
     private onParse = (res: ParseResult<T>): void => {
-        console.log(`Finished parsing ${this.path}`);
         const actualErrs = res.errors.filter(e => {
             return e.code !== 'UndetectableDelimiter';
         })

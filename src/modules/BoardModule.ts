@@ -1,12 +1,20 @@
 import type { IBoarder, ICell, ICellType, ICoordinate, IOrientation, ITile } from "../Interfaces";
 import { AlertError, doCoordsEqual, toggleOrientation } from "./Utils";
 
+export interface ICrossAnswerRef {
+    id: number,
+    or: IOrientation,
+}
+
 export class BoardModule {
     private input: string[][];
     private currentAHead: ICoordinate | undefined;
     private dHeads: (ICoordinate | undefined)[] = [];
     private nextId: number = 1;
-    private answersMap: Map<string, string>;
+    // head and orientation left, answers right
+    private headToAnswersMap: Map<string, string>;
+    // answer on the left, head and orientation on right
+    private answersToHeads: Map<string, ICrossAnswerRef[]>
     /**
      * y is first dimension
      */
@@ -14,8 +22,10 @@ export class BoardModule {
 
     public constructor(input: string[][]) {
         this.input = input;
-        this.answersMap = new Map();
+        this.headToAnswersMap = new Map();
         this.rows = this.makeRows(input);
+        this.answersToHeads = new Map();
+        this.reverseHeadToAnswersMap(this.headToAnswersMap);
     }
 
     ///////////////////
@@ -33,7 +43,11 @@ export class BoardModule {
 
     public getAnswer = (coord: ICoordinate, orientation: IOrientation): string | undefined => {
         const key = this.getAnswersMapKey(coord, orientation);
-        return this.answersMap.get(key);
+        return this.headToAnswersMap.get(key);
+    }
+
+    public getCrossReference = (answer: string): ICrossAnswerRef[] => {
+        return this.answersToHeads.get(answer) || [];
     }
 
     public getNextHead = (start: ICoordinate, or: IOrientation): ICoordinate | undefined => {
@@ -60,10 +74,8 @@ export class BoardModule {
     }
 
     private processRow = (row: string[], y: number): ITile[] => {
-        console.log('Process row y:', y);
         this.currentAHead = undefined;
         const rowOfTiles: ITile[] = row.map((cellVal, x) => {
-            console.log('Going through x', x, cellVal);
             const currentCoord: ICoordinate = [x, y];
             const type = this.getCellType(cellVal);
             return type === 'boarder' ? this.createBoarder(currentCoord) : this.createCell(currentCoord, cellVal);
@@ -104,13 +116,25 @@ export class BoardModule {
         return `x${head[0]}y${head[1]}_${orientation}`;
     }
 
+    private deconstructAnswersMapKey = (key: string) => {
+        const r = /x(\d+)y(\d+)_(across|down)/;
+        const parts = key.match(r);
+        if (parts?.length !== 4) throw new AlertError(`Invalid Key to deconstruct ${key}`);
+        const [_, x, y, or] = parts;
+        return { 
+            x: parseInt(x), 
+            y: parseInt(y),
+            or: or as IOrientation,
+        };
+    }
+
     private updateAnswersMap = (head: ICoordinate | undefined, cellAnswer: string, orientation: IOrientation) => {
         if (!head) return;
         const key = this.getAnswersMapKey(head, orientation);
-        let answer = this.answersMap.get(key);
+        let answer = this.headToAnswersMap.get(key);
         if (!answer) answer = '';
         answer += cellAnswer;
-        this.answersMap.set(key, answer);
+        this.headToAnswersMap.set(key, answer);
     }
 
     private getHead = (coord: ICoordinate, a?: string, b?: string): ICoordinate | undefined => {
@@ -136,6 +160,20 @@ export class BoardModule {
         if (c === '' || c === 'xx') return 'boarder';
         if (c.length !== 1) throw new AlertError(`Invalid Cell! ${c}`);
         return 'cell';
+    }
+
+    private reverseHeadToAnswersMap = (headToAnswersMap: Map<string, string>): void => {
+        headToAnswersMap.forEach((answer, orientationAndHead) => {
+            const { x, y, or } = this.deconstructAnswersMapKey(orientationAndHead);
+            let entry = this.answersToHeads.get(answer);
+            if (!entry) entry = [];
+            const cell = this.rows[y][x];
+            if (cell.type === 'boarder') throw new AlertError('Cross Referenced Key to a Boarder!: ' + orientationAndHead);
+            const id = cell.id;
+            if (!id) throw new AlertError('Cross Referenced to Non-Head!');
+            entry.push({ id, or });
+            this.answersToHeads.set(answer, entry);
+        });
     }
 }
 
@@ -169,5 +207,10 @@ export class BoardSingleton {
         const cell = this.board.getCell(coord);
         if (cell.type === 'boarder') return undefined;
         return or === 'across' ? cell.aHead : cell.dHead;
+    }
+
+    public static getCrossReference = (answer: string): ICrossAnswerRef[] => {
+        if (!this.board) throw new AlertError('BoardSingleton never set!');
+        return this.board.getCrossReference(answer);
     }
 }
