@@ -50,11 +50,11 @@
         return true;
     };
 
-    const boardCsvSource = "/board.csv";
+    const boardCsvSource = "./board.csv";
     boardCsv = new Csv(boardCsvSource, boardValidator, false);
     const boardPromise = boardCsv.ingest();
 
-    const answerKeyCsvSource = "/answerKey.csv";
+    const answerKeyCsvSource = "./answerKey.csv";
     answerKeyCsv = new Csv(answerKeyCsvSource, answerKeyValidator, true);
     const answerKeyPromise = answerKeyCsv.ingest();
 

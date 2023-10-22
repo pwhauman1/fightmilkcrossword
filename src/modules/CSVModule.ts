@@ -15,6 +15,7 @@ export class Csv<T> {
     private validator?: (data: unknown) => void;
     constructor(path: string, validator?: IValidator, areHeadersPresent?: boolean) {
         this.path = path;
+        console.log("🚀 ~ file: CSVModule.ts:18 ~ Csv<T> ~ constructor ~ path:", path)
         this.areHeadersPresent = !!areHeadersPresent;
         if (validator) {
             this.validator = (data: unknown) => {
