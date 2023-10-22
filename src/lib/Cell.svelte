@@ -1,11 +1,11 @@
 <script lang="ts">
     import { onDestroy, onMount } from "svelte";
     import { type ICoordinate } from "../Interfaces";
-    import { currentHeadStore, selectedCellStore } from "../modules/Stores";
+    import { currentHeadStore, referencedAnswersStore, selectedCellStore } from "../modules/Stores";
     import { onCellClick, onCellInput } from "../modules/InteractionModule";
     import { doCoordsEqual, isFlagOn } from "../modules/Utils";
     import type { Unsubscriber } from "svelte/store";
-    import { stateModule } from "../modules/StateModule";
+    import { savedStateModule } from "../modules/StateModule";
     export const type = "cell";
     export let dHead: ICoordinate | undefined = undefined;
     export let aHead: ICoordinate | undefined = undefined;
@@ -17,8 +17,11 @@
     let unsubs: Unsubscriber[] = [];
     let value = '';
     let shouldHighlight = false;
+    let isReferenced = false;
+    let isReferencedAndShouldShow = false;
+    $: isReferencedAndShouldShow = isReferenced && !shouldHighlight;
     onMount(() => {
-        value = stateModule.get(coordinate);
+        value = savedStateModule.get(coordinate);
         if (isFlagOn('cheat')) value = answer;
         const nextFocusUnsub = selectedCellStore.subscribe((event) => {
             if (!event) return;
@@ -37,8 +40,18 @@
             if (orientation === "down")
                 shouldHighlight = doCoordsEqual(dHead, head);
         });
+        const referencedAnswerUnsub = referencedAnswersStore.subscribe((references) => {
+            let isToBeReferenced = false;
+            references.forEach(ref => {
+                if (isToBeReferenced) return;
+                const head = ref.orientation === 'across' ? aHead : dHead;
+                isToBeReferenced = doCoordsEqual(head, ref.head);
+            });
+            isReferenced = isToBeReferenced;
+        });
         unsubs.push(nextFocusUnsub);
         unsubs.push(currentHeadUnsub);
+        unsubs.push(referencedAnswerUnsub);
     });
 
     onDestroy(() => {
@@ -81,6 +94,7 @@
         on:keyup={onkeyup}
         on:click={onclick}
         class:should-highlight={shouldHighlight}
+        class:is-referenced={isReferencedAndShouldShow}
         bind:this={me}
     />
 </div>
@@ -95,6 +109,9 @@
     }
     .should-highlight {
         background-color: yellow;
+    }
+    .is-referenced {
+        background-color: lightsalmon;
     }
     .container {
         position: relative;

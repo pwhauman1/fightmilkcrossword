@@ -12,17 +12,17 @@ interface ICurrentHeadEvent {
 }
 export const currentHeadStore = writable<ICurrentHeadEvent | undefined>();
 
-/**
- * TODO: there is no way to map a head to the clue :(
- * Some ideas
- * - when creating the board, add answers to cell info <-- this one works best?
- * - when cells high light, organize word
- */
+export interface IReferencedAnswers {
+    head: ICoordinate,
+    orientation: IOrientation,
+}
+export const referencedAnswersStore = writable<IReferencedAnswers[]>([]);
 
 class StoreReader {
     private orientation: IOrientation = 'across';
     private currentHead: ICoordinate | undefined;
     private selectedCell: ICoordinate | undefined;
+    private referencedAnswers: IReferencedAnswers[] = [];
     public static instance: StoreReader | undefined;
     private constructor() {
         this.setOrientation = this.setOrientation.bind(this);
@@ -35,6 +35,10 @@ class StoreReader {
         this.setSelectedCell = this.setSelectedCell.bind(this);
         selectedCellStore.subscribe(this.setSelectedCell);
         this.getCurrentCell = this.getCurrentCell.bind(this);
+
+        this.setReferencedAnswers = this.setReferencedAnswers.bind(this);
+        referencedAnswersStore.subscribe(this.setReferencedAnswers);
+        this.getReferencedAnswers = this.getReferencedAnswers.bind(this);
     }
 
     static get(): StoreReader {
@@ -72,6 +76,13 @@ class StoreReader {
     }
     public getCurrentCell(): ICoordinate | undefined {
         return this.selectedCell;
+    }
+
+    private setReferencedAnswers(value: IReferencedAnswers[]) {
+        this.referencedAnswers = value;
+    }
+    public getReferencedAnswers(): IReferencedAnswers[] {
+        return this.referencedAnswers;
     }
 }
 

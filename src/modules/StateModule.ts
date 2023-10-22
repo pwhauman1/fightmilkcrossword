@@ -1,6 +1,6 @@
 import type { ICoordinate } from "../Interfaces";
 
-class StateModule {
+class SavedStateModule {
     public remove = (coord: ICoordinate): void => {
         const key = this.getCoordKey(coord);
         localStorage.removeItem(key);
@@ -29,5 +29,5 @@ class StateModule {
     }
 }
 
-const stateModule = new StateModule();
-export { stateModule };
+const savedStateModule = new SavedStateModule();
+export { savedStateModule };

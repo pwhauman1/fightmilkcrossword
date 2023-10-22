@@ -1,40 +1,59 @@
 import { BoardSingleton, type ICrossAnswerRef } from "./BoardModule";
+import { referencedAnswersStore, type IReferencedAnswers } from "./Stores";
 import { AlertError } from "./Utils";
 
 export function scrubClue(clue: string): string {
-    if (!shouldScrubBrackets(clue)) return clue;
+    if (!shouldScrubBrackets(clue)) {
+        referencedAnswersStore.set([]);
+        return clue;
+    }
     let scrubbedClue = '';
     const parts = clue.split(/\[|\]/);
     let shouldScrubThisPart = false;
+    const referencedAnswersToEmit: IReferencedAnswers[] = [];
     parts.forEach(p => {
         if (shouldScrubThisPart) {
-            scrubbedClue += getReplacement(p);
+            const {
+                strToShow,
+                referencedAnswers
+            } = getReplacement(p);
+            scrubbedClue += strToShow;
+            const refs = referencedAnswers.map(a => ({
+                orientation: a.or,
+                head: a.head,
+            }));
+            referencedAnswersToEmit.push(...refs);
         } else {
             scrubbedClue += p;
         }
         shouldScrubThisPart = !shouldScrubThisPart;
     });
+    referencedAnswersStore.set(referencedAnswersToEmit);
     return scrubbedClue;
 }
 
-function getReplacement(answer: string): string {
-    const options = BoardSingleton.getCrossReference(answer);
+function getReplacement(answer: string) {
+    const referencedAnswers = BoardSingleton.getCrossReference(answer);
     const convertToPresentableString = (crossRef: ICrossAnswerRef) => {
         return `${crossRef.id}${crossRef.or.slice(0, 1).toLocaleUpperCase()}`;
     }
-    if (options.length === 0) {
+    if (referencedAnswers.length === 0) {
         throw new AlertError('Cross Reference Not Found! Looking for ' + answer);
     }
-    if (options.length === 1) {
-        return convertToPresentableString(options[0]);
+    let strToShow = '';
+    if (referencedAnswers.length === 1) {
+        strToShow = convertToPresentableString(referencedAnswers[0]);
     } else {
-        let str = convertToPresentableString(options[0]);
-        options.forEach((o, idx) => {
+        strToShow = convertToPresentableString(referencedAnswers[0]);
+        referencedAnswers.forEach((o, idx) => {
             if (idx === 0) return;
-            str += ' and ' + convertToPresentableString(o);
+            strToShow += ' and ' + convertToPresentableString(o);
         });
-        return str;
     }
+    return {
+        strToShow,
+        referencedAnswers,
+    };
 }
 
 /**

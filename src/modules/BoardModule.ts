@@ -4,6 +4,7 @@ import { AlertError, doCoordsEqual, toggleOrientation } from "./Utils";
 export interface ICrossAnswerRef {
     id: number,
     or: IOrientation,
+    head: ICoordinate,
 }
 
 export class BoardModule {
@@ -171,7 +172,8 @@ export class BoardModule {
             if (cell.type === 'boarder') throw new AlertError('Cross Referenced Key to a Boarder!: ' + orientationAndHead);
             const id = cell.id;
             if (!id) throw new AlertError('Cross Referenced to Non-Head!');
-            entry.push({ id, or });
+            const head: ICoordinate = [x, y];
+            entry.push({ id, or, head});
             this.answersToHeads.set(answer, entry);
         });
     }
