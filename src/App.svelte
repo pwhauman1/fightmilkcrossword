@@ -11,7 +11,7 @@
     let answerKeyCsv: Csv<IAnswerKey>;
 
     onMount(() => {
-        const WAIT_TIME = 10 * 1000; // wait 10 s
+        const WAIT_TIME = 1 * 1000; // wait 10 s
         setTimeout(() => {
             isLoading = false;
         }, WAIT_TIME);
