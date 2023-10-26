@@ -10,7 +10,7 @@ class SavedStateModule {
         if (val === '') {
             this.remove(coord);
         } else {
-            localStorage.setItem(key, val);
+            localStorage.setItem(key, val.toLocaleUpperCase());
         }
     }
     public clearAll = (): void => {
@@ -19,7 +19,7 @@ class SavedStateModule {
     public get = (coord: ICoordinate): string => {
         const key = this.getCoordKey(coord);
         const val = localStorage.getItem(key);
-        if (val) return val;
+        if (val) return val.toUpperCase();
         return '';
     }
 
